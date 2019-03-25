@@ -28,6 +28,31 @@ public class Main {
             System.out.println("usuario: "+user.toString());
         //hola
         //TAREA 3. AUTENTICAR EL CLIENTE CON EL SERVIDOR
-        
+
+        /*
+Class Autentica->Cliente
+
+public String EnviarPost(String urlpost,String user,...){
+    String postparam="user"+ user+ "&dni"+...
+    inputstream is =null;
+    String result= null;
+    HttpConnection conn=null;
+}
+
+respuesta=enlace.noseque(Http:Direccion Ip:Puerto: Directorio)
+
+public class autentica extends HttpServlet{
+    --user
+    --dni
+    protected void processRequest (HttpServlets request, HttpServlet... response){
+
+        "Busqueda en la base de datos
+{HTML}
+
+}
+protected void doPost
+
+}
+*/
     }
 }

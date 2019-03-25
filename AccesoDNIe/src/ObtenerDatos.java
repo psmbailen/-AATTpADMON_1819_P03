@@ -59,7 +59,24 @@ public class ObtenerDatos {
         String completName = null;
 
         //[1] PRÁCTICA 3. Punto 1.a
+        /*Todos son el comando SELECT. Este comando permite la seleccion de fichero dedicado a (DF) o de un fichero elemental (EF). 
+        Esto lo sabemos ya que en el siguiente array de bytes tiene la misma estructura que el comando APDU de la guía de comandos
+        - El primer octeto 0x00 es el campo CLA
+        - El segundo octeto 0xA4 es el campo INS
+        - El tercero octeto  es el campo P1. Puede ser 0x00(Selecciona DF o EF por Id) o 0x04(Seleccion directa de DF por nombre)
+        - El cuarto octeto es 0x00 es el campo P2.
+        - El quinto octeto es el campo LC, es la longitud del campo de datos.
+        - El sexto octeto son los datos de acuerdo a P1-P2.
+        - El séptimo octeto es el campo LE que esta vacío
+       */ 
+      
         byte[] command = new byte[]{(byte) 0x00, (byte) 0xa4, (byte) 0x04, (byte) 0x00, (byte) 0x0b, (byte) 0x4D, (byte) 0x61, (byte) 0x73, (byte) 0x74, (byte) 0x65, (byte) 0x72, (byte) 0x2E, (byte) 0x46, (byte) 0x69, (byte) 0x6C, (byte) 0x65};
+        /* 
+        En este caso P1 es 0x04
+        LC es 0x0b
+        Los datos son: 4D 61 73 74 65 72 2E 46 69 6C 65 en formato hexadecimal
+        Si lo pasamos a ASCII ya que P1 selecciona por nombr nos sale que significa Master.File que es un comando de seleción por nombre del fichero maestro
+        */
         ResponseAPDU r = ch.transmit(new CommandAPDU(command));
         if ((byte) r.getSW() != (byte) 0x9000) {
             System.out.println("ACCESO DNIe: SW incorrecto");
@@ -68,6 +85,12 @@ public class ObtenerDatos {
 
         //[2] PRÁCTICA 3. Punto 1.a
         command = new byte[]{(byte) 0x00, (byte) 0xA4, (byte) 0x00, (byte) 0x00, (byte) 0x02, (byte) 0x50, (byte) 0x15};
+        /*
+        En este caso P1 es 0x00
+        LC es 0x02
+        Los datos son: 50 15
+        Si lo pasamos a decimal ya que P1 seleccionar por ID nos sale el número 80 que es el ID del fichero
+        */
         r = ch.transmit(new CommandAPDU(command));
 
         if ((byte) r.getSW() != (byte) 0x9000) {
@@ -77,8 +100,15 @@ public class ObtenerDatos {
 
         //[3] PRÁCTICA 3. Punto 1.a
         command = new byte[]{(byte) 0x00, (byte) 0xA4, (byte) 0x00, (byte) 0x00, (byte) 0x02, (byte) 0x60, (byte) 0x04};
+          /*
+        En este caso P1 es 0x00
+        LC es 0x02
+        Los datos son: 60 04
+        Si lo pasamos a decimal ya que P1 seleccionar por ID nos sale el número 96 que es el ID del fichero
+        
+        */
         r = ch.transmit(new CommandAPDU(command));
-
+        
         byte[] responseData = null;
         if ((byte) r.getSW() != (byte) 0x9000) {
             System.out.println("ACCESO DNIe: SW incorrecto");
@@ -93,12 +123,19 @@ public class ObtenerDatos {
 
         do {
              //[4] PRÁCTICA 3. Punto 1.b OJO
-            final byte CLA = (byte) 0xFF;//Buscar qué valor poner aquí (0xFF no es el correcto)
-            final byte INS = (byte) 0xFF;//Buscar qué valor poner aquí (0xFF no es el correcto)
-            final byte LE = (byte) 0xFF;// Identificar qué significa este valor
+            
+            /* Es el comando Read Binary cuyo comando devuelve en su mensaje de respuesta el contenido (o parte) de
+        	un fichero elemental transparente.
+            */
+            final byte CLA = (byte) 0x00;//Este valor puede variar desde 0x00 hasta 0x0F
+            final byte INS = (byte) 0xB0;//
+            final byte LE = (byte) 0xFF;/*Es el campo LE que es el número de bytes a leer.
+                                         Si el campo Le=0 el número de bytes a leer es 256. 
+            				En este caso vale 255 porque FF=255 si lo pasamos a decimal			*/
 
             //[4] PRÁCTICA 3. Punto 1.b
             command = new byte[]{CLA, INS, (byte) bloque/*P1*/, (byte) 0x00/*P2*/, LE};//Identificar qué hacen P1 y P2
+            //P1 y P2 son el offsert del primer byte a leer desde el principio del fichero
             r = ch.transmit(new CommandAPDU(command));
 
             //System.out.println("ACCESO DNIe: Response SW1=" + String.format("%X", r.getSW1()) + " SW2=" + String.format("%X", r.getSW2()));
@@ -209,3 +246,5 @@ public class ObtenerDatos {
        return null;
     }
 }
+
+
